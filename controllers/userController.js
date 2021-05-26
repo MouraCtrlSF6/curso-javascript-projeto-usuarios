@@ -8,15 +8,17 @@ class UserController{
         this.formEl.addEventListener('submit', event=>{
             event.preventDefault();
             let myValues = this.values;
-            myValues.photo = "";
-            this.photo.then(content => {
-                //The 'content' varible receives the fileReader.result content
-                myValues.photo = content;
-                //The use of this to refer to the object userController is posible here because the arrow function does not
-                //change the working scope
-                this.addLine(myValues, this.tbodyEl);  
-                this.formEl.reset();
-            });
+            if(myValues){
+                myValues.photo = "";
+                this.photo.then(content => {
+                    //The 'content' varible receives the fileReader.result content
+                    myValues.photo = content;
+                    //The use of this to refer to the object userController is posible here because the arrow function does not
+                    //change the working scope
+                    this.addLine(myValues, this.tbodyEl);  
+                    this.formEl.reset();
+                });
+            }
         });
     }
     addLine(dataUser, tbodyEl){  
@@ -66,8 +68,27 @@ class UserController{
             }
         });
     }
+    validateForm(currentField){
+        const fields = [];
+        [...this.formEl.elements].forEach(field => {
+            if(fields.indexOf(field.name) === -1 && field.name !== 'photo' && field.type !== 'submit'){
+                fields.push(field.name);
+            }
+        });
+        if(fields.indexOf(currentField.name) > -1){
+            if(currentField.value == ""){
+                let label = currentField.parentElement.children[0].innerHTML
+                console.error(`${label} is not nullable`)
+                currentField.parentElement.classList.add('has-error')
+                return false;
+            }
+            currentField.parentElement.classList.remove('has-warning')
+            return true;
+        }
+    }
     get values(){
         let user = {};
+        const validation = [];
         /*
             Use of 'Spread' is necessary here: obj => Array
             Example: [] => Array's operator
@@ -75,6 +96,7 @@ class UserController{
             Example: [...items] => An array with an undefined number of elements
         */
         [...this.formEl.elements].forEach(currentField => {
+            validation.push(this.validateForm(currentField))
             if(currentField.name === 'gender'){
                 if(currentField.checked){
                     user[currentField.name] = currentField.id;
@@ -90,6 +112,11 @@ class UserController{
                 user[currentField.name] = currentField.value;
             }
         });
+
+        if(validation.indexOf(false) > -1){
+            return false;
+        }
+
         let objectUser = new User(user.name, 
             user.gender, 
             user.birth, 
