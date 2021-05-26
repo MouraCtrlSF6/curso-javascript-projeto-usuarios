@@ -4,12 +4,9 @@ class UserController{
         this.formEl = document.getElementById(formId);
         this.onSubmit();
     }
-
     onSubmit(){
         this.formEl.addEventListener('submit', event=>{
             event.preventDefault();
-            const submitBtn = this.formEl.querySelector('[type=submit]');
-            submitBtn.disabled = true;
             let myValues = this.values;
             myValues.photo = "";
             this.photo.then(content => {
@@ -27,8 +24,8 @@ class UserController{
             <td><img src="${dataUser.photo}" alt="User Image" class="img-circle img-sm"></td>
             <td>${dataUser.name}</td>
             <td>${dataUser.email}</td>
-            <td>${dataUser.admin}</td>  
-            <td>${dataUser.birth}</td>
+            <td>${(dataUser.admin)?'Sim':'Nao'}</td>  
+            <td>${dataUser.register.toLocaleDateString()}</td>
             <td>
                 <button type="button" class="btn btn-primary btn-xs btn-flat">Editar</button>
                 <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
@@ -87,7 +84,7 @@ class UserController{
                 // ternary if: If(currentField.checked)
                 // ? then, return __
                 // : else, return __
-                currentField.checked ? user[currentField.name] = 'Sim' : user[currentField.name] = 'Não';
+                currentField.checked ? user[currentField.name] = true : user[currentField.name] = false;
             }
             else {  
                 user[currentField.name] = currentField.value;
